@@ -9,25 +9,31 @@ Given(/^I am on app login Page$/, async () => {
 });
 
 // Perform login action
-When(/^I login with (.*) and (.*)$/, async (username, password) => {
-  await loginPage.loginAction(username, password);
+ When(/^I login with "([^"]*)" and "([^"]*)"$/, async (username, password) => {
+   await loginPage.loginAction(username, password);
+ });
+
+//verify Locked outcome
+Then(/^I see locked error message$/, async () => {
+  await expect(loginPage.genericError).toHaveText("Sorry, this user has been locked out.");
 });
 
+//verify NoMatch outcome
+Then(/^I see do not match error message$/, async () => {
+  await expect(loginPage.genericError).toHaveText("Provided credentials do not match any user in this service.");
+});
 
-// Verify the invalid outcome
-Then(/^I should see (.*) for (.*)$/, async(outcome, user) => {
-const expectations = {
-  "LOCKED": () => expect(loginPage.genericError).toHaveText(outcome),
-  "NO_MATCH": () => expect(loginPage.genericError).toHaveText(outcome),
-  "NO_USERNAME": () => expect(loginPage.usernameError).toHaveText(outcome),
-  "NO_PASSWORD": () => expect(loginPage.passwordError).toHaveText(outcome)
-};
-return (expectations[user] || (() => Promise.resolve()))();
+//verify No username outcome
+Then(/^I see username required error message$/, async () => {
+  await expect(loginPage.usernameError).toHaveText("Username is required");
+});
 
+//verify No password outcome
+Then(/^I see password required error message$/, async () => {
+  await expect(loginPage.passwordError).toHaveText("Password is required");
 });
 
 //verify valid outcome
-Then(/^I see Product page$/, async () => {
+Then(/^I see products page$/, async () => {
   await expect(loginPage.productPage).toHaveText("Products");
 });
-
